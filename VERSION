@@ -1,0 +1,4 @@
+CHANGES v 2.0 
+This  version that learns a Markov Random Field from an input alignment with parameters optimized for accuracy and speed of contact prediction.
+CHANGES v 2.01 
+Fixed a bug in sequence reweighting in the public version.

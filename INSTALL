@@ -1,0 +1,37 @@
+This is GREMLIN v2.01 - a version that learns a Markov Random Field from an input alignment with parameters optimized for accuracy and speed of contact prediction.
+
+You have two options to run gremlin code
+
+1) As a matlab function:
+
+  a) compile the mex executables for your system architecture as follows:
+
+  within matlab, go to the gremlin dir and type
+
+  >mexAll
+
+  b) add gremlin to your matlabpath. One way to do this is to go to the gremlin src dir in matlab and then type
+
+  >addpath(genpath(pwd));
+
+or,
+
+2) As a compiled executable:
+
+You'll need to compile on a m/c that has a matlab license (with the statistics toolbox) which has the same architecture as the machine  you plan
+to run on. If you are running on a linux x86-64 machine, you might be able to use the precompiled executables bundled
+with this tar-ball. You'll also need the matlab component runtime (MCR) installed on the machine you run the code on
+(this can be freely downloaded from the mathworks website without having a MATLAB license).
+
+To compile:
+go to the gremlin directory 
+type on the unix shell (expects mcc to be on your path)
+$bash make.sh
+
+This should create an executable called gremlin end an wrapper shell script called run_gremlin.sh
+
+You may use run_gremlin.sh just as you call gremlin but with one additional parameter at the beginning: the path to the MCR
+
+Note:
+This version of gremlin uses pdist which is included with the statistics toolkit. 
+We are working on a providing an alternate which does not need this toolkit.

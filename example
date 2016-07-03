@@ -1,0 +1,28 @@
+If you have a x86_64 Linux, you can use the pre-compiled version in this directory!
+
+1) download and install the MCR: http://www.mathworks.com/supportfiles/MCR_Runtime/R2012a/MCR_R2012a_glnxa64_installer.zip
+2) ./run_gremlin.sh ~/MATLAB_Compiler_Runtime/v717 1whzA.id90cov82.cut.msa 1whzA.id90cov82.cut.apc verbose 1
+
+the "~/MATLAB_Compiler_Runtime/v717" is the MCR from the above installation
+
+## UPDATE SEP 03, 2016 ##
+The output apc file is length x length matrix of apc(l2norm(20x20 coupling matrix))
+
+The value depends on number of sequences, diversity of sequence, length and number of iterations. Hence they should only be used for relative ranking.
+There is no simple way to standardize the values, given they are not normally distributed (sometimes skewed, sometime multimodal, depending on protein family)
+
+We made an attempt to standardize the values using statistics from the entire PDB:
+http://elifesciences.org/content/4/e09248v2/figure16
+
+In short:
+1) We compute the neff (effective number of sequences at reweight 0.20, this value is reported when gremlin is first run).
+2) We take the top 1.5xLENGTH contacts with sequence seperation >= 3. The values are then rescales so that the minimum is 0.5 and the average is at 1.0.
+3) Using this scaled GREMLIN score and neff/sqrt(LENGTH) we find we can predicted the probability of contact.
+
+## UPDATE FEB 24, 2016 ##
+We've added an option to output the MRF model:
+./run_gremlin.sh ~/MATLAB_Compiler_Runtime/v717/ 1whzA.id90cov82.cut.msa 1whzA.id90cov82.cut.apc verbose 1 save_model 1whzA.id90cov82.cut.model
+
+the order of the amino acids: ARNDCQEGHILKMFPSTWYV-
+if the row contains 21 values: these are part of the conservation vector (20 amino acids + 1 gap)
+if the row contains 443 values: these are part of the coupling matrix (i,j,21x21)

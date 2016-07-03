@@ -1,0 +1,97 @@
+This is GREMLIN v2.01 - a version that learns a Markov Random Field from an input alignment with parameters optimized for accuracy and speed of contact prediction.
+
+Once you've installed gremlin (see INSTALL)
+
+----------
+Usage
+----------
+	1) Within matlab
+	
+	gremlin(<input_msa_file>, <output_file>, 'option_name', 'option_value',...)
+	
+	where supported options are:
+	
+	
+	lambda_l2 (float): specifies the strength of the regularization parameter for the edge coupling (def:1)
+	lambda_bias(float): strength of regularization parameter for node weights (def:0.01)
+	lambda_l2_scale_by_length(boolean): to scale lambda_l2 by length of protein (def:1)
+	apc (boolean): Do APC correction at the end(def:1)
+	MaxIter(int): Number of iterations to run optimization (def:40). 
+	verbose(boolean): To give detailed output during minimization (def:0)
+  lambda_matf (string): file containing symmetric matrix of lambda values (from priors).  
+  lambda_mat_multiplier(float): weight to give lambda_matf. If lambda_matf is log(prob), then this value should be a negative number (def: 1)
+
+  --using priors--
+  We are working on making distributable versions of the code we used to generate the priors. 
+  Until then, please use our webserver: http://gremlin.bakerlab.org if you'd like to use the ss/svm prior information. 
+
+
+  --other options (not used in recommended settings) --
+  method:'cg' or 'LBFGS' have been tested (def:'cg'). 
+	    CORR (int): Number of iterations to use to compute approximate Hessian in LBFGS(def:40, if method is 'LBFGS').
+  multiplicative_lam(boolean): to add or to multiply lambda_l2 with lambda_matf (def:0)
+               if multiplicative_lam==0:
+                 lambda(i,j) = [lambda_l2+lambda_mat(i,j)]
+               else:
+                 lambda(i,j) = [lambda_l2*lambda_mat(i,j)]
+            Note:when lambda_l2_scale_by_length is turned on, it is applied at the end of this to all lambda(i,j).
+	
+	2) From command line using compiled executable
+	
+  **For this to work, you'll need the pre-compiled mex executables compiled for your architecture. We have include mex executables for an x86_64 architecture.**
+
+	Same as above except
+	a) First argument to run_gremlin.sh should be the path to the MCR
+	b) Replace commas with whitespace.
+
+	
+	Example:
+	$run_gremlin.sh <MCR_PATH> <input_msa> <output_file> <option_name> <option_value>
+
+  Notes: contact prediction accuracy does not appear to be sensitive to most of these options except lambda_l2(increasing it can worsen accuracy) and apc (the code assumes apc will be done at the end and therefore 
+  does not correct for entropy in anyway; therefore turning it off will almost consistently make things worse). If you find that changing the options consistently improves behavior on your inputs, we'd love to know more 
+  about your inputs!
+
+
+--------
+File formats
+--------
+  1) Input format:
+  Input msa file is plain text and can be
+    (a) a list of aligned sequences, one in each line. This is the same format as PSICOV. 
+    or,
+    (b) a list of <name><whitespace><seq> in each line. 
+
+  2) Output format:
+  Outputs a symmetric matrix as a text file. mat[i][j] is strength of interaction between col i and col j of the msa. Diagonal is set to 0.
+
+
+------
+Typical Protocol for Generating Alignments
+------
+
+This is the protocol we've been using to generate alignments
+
+1) run hhblits -n 4 -maxfilt 100000 -neffmax 20 -cpu 20 -nodiff
+
+2) remove rows that have more than 25% gaps. 
+
+3) remove colums that have more than 25% gaps. 
+
+4) generate a non-redundant set of sequences (using hhfilter -id 90) and convert format
+
+4a) (optional) generate priors
+
+5) run gremlin
+
+Alternately, you can use our webserver that automates these steps for you: http://gremlin.bakerlab.org
+------
+Notes 
+-----
+1) GREMLIN v2 and the older v1 (serial version) use C implementations of lbfgs minimizer and pseudo-likelihood computation and associated matlab wrappers from Mark Schmidt's software page. 
+See http://www.di.ens.fr/~mschmidt/Software/index.html
+2) If you use this code in your research,  please cite the following papers:
+  Hetunandan Kamisetty, Sergey Ovchinnikov, and David Baker. 
+    "Assessing the utility of co-evolution based residue-residue contact predictions in a sequence and structure-rich era." PNAS (2013)
+  Sivaraman Balakrishnan, Hetunandan Kamisetty, Jaime G. Carbonell, Su-In Lee, and Christopher James Langmead. 
+    "Learning generative models for protein fold families." Proteins: Structure, Function, and Bioinformatics 79, no. 4 (2011): 1061-1078. 
